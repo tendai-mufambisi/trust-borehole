@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { motion, useScroll, useTransform, useInView } from "motion/react";
-import { useRef, useState } from "react";
+import { motion, useScroll, useTransform } from "motion/react";
+import { useRef } from "react";
 import {
   Droplets, Sun, Wrench, Gauge, ShieldCheck, Phone, ArrowUpRight,
   Sparkles, MapPin, Clock, CheckCircle2, ChevronDown, Zap, Waves,
