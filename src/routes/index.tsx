@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { motion, useScroll, useTransform } from "motion/react";
+import { motion, useScroll, useTransform, useInView } from "motion/react";
 import { useRef, useState } from "react";
 import {
   Droplets, Sun, Wrench, Gauge, ShieldCheck, Phone, ArrowUpRight,
