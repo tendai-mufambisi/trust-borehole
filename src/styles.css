@@ -39,9 +39,9 @@
   --color-sun-glow: var(--sun-glow);
   --color-earth: var(--earth);
 
-  --font-display: "Fraunces", "Times New Roman", serif;
-  --font-sans: "Inter Tight", system-ui, sans-serif;
-  --font-mono: "JetBrains Mono", monospace;
+  --font-display: "Instrument Serif", "Times New Roman", serif;
+  --font-sans: "Geist", system-ui, sans-serif;
+  --font-mono: "Geist Mono", ui-monospace, monospace;
 }
 
 :root {
@@ -143,6 +143,27 @@
   from { background-position: 200% 0; }
   to { background-position: -200% 0; }
 }
+
+@utility ken-burns {
+  animation: kenburns 24s ease-in-out infinite alternate;
+}
+@keyframes kenburns {
+  0% { transform: scale(1.15) translate3d(-2%, -1%, 0); filter: saturate(1.05) brightness(0.95); }
+  50% { transform: scale(1.25) translate3d(2%, 1%, 0); filter: saturate(1.15) brightness(1.02); }
+  100% { transform: scale(1.18) translate3d(1%, -2%, 0); filter: saturate(1.1) brightness(0.98); }
+}
+
+@utility hero-mask {
+  -webkit-mask-image: radial-gradient(ellipse 90% 70% at 50% 40%, black 55%, transparent 100%);
+          mask-image: radial-gradient(ellipse 90% 70% at 50% 40%, black 55%, transparent 100%);
+}
+
+@utility float-slow {
+  animation: floatSlow 10s ease-in-out infinite;
+}
+@keyframes floatSlow {
+  0%,100% { transform: translateY(0) }
+  50% { transform: translateY(-14px) }
 
 @utility grain {
   position: relative;

@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { motion, useScroll, useTransform } from "motion/react";
-import { useRef, useState } from "react";
+import { useRef } from "react";
 import {
   Droplets, Sun, Wrench, Gauge, ShieldCheck, Phone, ArrowUpRight,
   Sparkles, MapPin, Clock, CheckCircle2, ChevronDown, Zap, Waves,
@@ -44,6 +44,7 @@ function Home() {
       <Promo />
       <Process />
       <Gallery />
+      <Team />
       <Pricing />
       <Testimonials />
       <CTA />
@@ -96,69 +97,108 @@ function Nav() {
 function Hero() {
   const ref = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end start"] });
-  const y = useTransform(scrollYProgress, [0, 1], [0, 200]);
-  const opacity = useTransform(scrollYProgress, [0, 0.8], [1, 0]);
+  const bgY = useTransform(scrollYProgress, [0, 1], ["0%", "25%"]);
+  const bgScale = useTransform(scrollYProgress, [0, 1], [1, 1.15]);
+  const overlayOpacity = useTransform(scrollYProgress, [0, 1], [0.55, 0.95]);
+  const textY = useTransform(scrollYProgress, [0, 1], [0, 120]);
+  const textOpacity = useTransform(scrollYProgress, [0, 0.7], [1, 0]);
 
   return (
-    <section id="top" ref={ref} className="relative min-h-screen bg-hero overflow-hidden pt-32 pb-20">
-      {/* Ambient orbs */}
-      <motion.div style={{ y }} className="absolute -top-40 -right-40 size-[600px] rounded-full bg-sun/20 blur-3xl" />
-      <motion.div style={{ y: useTransform(scrollYProgress, [0, 1], [0, -150]) }} className="absolute bottom-0 -left-40 size-[500px] rounded-full bg-water/30 blur-3xl" />
+    <section id="top" ref={ref} className="relative min-h-screen overflow-hidden">
+      {/* Full-bleed background image with Ken Burns + parallax */}
+      <motion.div style={{ y: bgY, scale: bgScale }} className="absolute inset-0 will-change-transform">
+        <motion.img
+          src={hero.url}
+          alt="Trust technician on the road"
+          initial={{ scale: 1.3, opacity: 0, filter: "blur(20px)" }}
+          animate={{ scale: 1.15, opacity: 1, filter: "blur(0px)" }}
+          transition={{ duration: 2.4, ease: [0.22, 1, 0.36, 1] }}
+          className="absolute inset-0 size-full object-cover ken-burns"
+        />
+      </motion.div>
 
-      <div className="relative mx-auto max-w-7xl px-6 grid lg:grid-cols-12 gap-12 items-center">
-        <motion.div style={{ opacity }} className="lg:col-span-7 space-y-8">
+      {/* Layered gradient atmospheres */}
+      <motion.div style={{ opacity: overlayOpacity }} className="absolute inset-0 bg-gradient-to-b from-ink/40 via-ink/60 to-ink" />
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_30%_30%,oklch(0.45_0.18_240/0.45),transparent_60%),radial-gradient(ellipse_at_80%_70%,oklch(0.6_0.18_65/0.35),transparent_55%)]" />
+
+      {/* Scanning light sweep */}
+      <motion.div
+        initial={{ x: "-100%" }}
+        animate={{ x: "200%" }}
+        transition={{ duration: 6, repeat: Infinity, ease: "linear", repeatDelay: 2 }}
+        className="absolute inset-y-0 w-1/3 bg-gradient-to-r from-transparent via-sun/10 to-transparent pointer-events-none"
+      />
+
+      {/* Floating ambient orbs */}
+      <div className="absolute -top-40 -right-40 size-[500px] rounded-full bg-sun/20 blur-3xl float-slow" />
+      <div className="absolute bottom-10 -left-40 size-[480px] rounded-full bg-water/30 blur-3xl float-slow" style={{ animationDelay: "-5s" }} />
+
+      {/* Drifting particles */}
+      {[...Array(18)].map((_, i) => (
+        <motion.span
+          key={i}
+          className="absolute size-1 rounded-full bg-sun-glow/70"
+          initial={{ x: `${(i * 53) % 100}%`, y: "110%", opacity: 0 }}
+          animate={{ y: "-10%", opacity: [0, 1, 0] }}
+          transition={{ duration: 8 + (i % 5), delay: i * 0.5, repeat: Infinity, ease: "linear" }}
+          style={{ left: `${(i * 53) % 100}%` }}
+        />
+      ))}
+
+      {/* Content */}
+      <div className="relative z-10 mx-auto max-w-7xl px-6 pt-40 pb-24 min-h-screen flex flex-col justify-center">
+        <motion.div style={{ y: textY, opacity: textOpacity }} className="max-w-4xl space-y-8">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
-            className="inline-flex items-center gap-2 rounded-full glass px-3 py-1.5 text-xs uppercase tracking-[0.2em]"
+            transition={{ delay: 0.6 }}
+            className="inline-flex items-center gap-2 rounded-full glass px-3 py-1.5 text-xs uppercase tracking-[0.25em]"
           >
             <span className="relative flex size-1.5">
               <span className="absolute inset-0 rounded-full bg-sun ripple" />
               <span className="relative size-1.5 rounded-full bg-sun" />
             </span>
-            Trusted across Zimbabwe
+            Zimbabwe's trusted name in water & power
           </motion.div>
 
-          <h1 className="font-display font-light text-[clamp(3rem,8vw,7rem)] leading-[0.92] tracking-[-0.03em] text-balance">
-            <Reveal delay={0.1}>Reliable</Reveal>
+          <h1 className="font-display font-normal text-[clamp(3.5rem,10vw,9rem)] leading-[0.9] tracking-[-0.025em] text-balance">
+            <Reveal delay={0.2}>Reliable</Reveal>
             <br />
-            <Reveal delay={0.25}>
-              <em className="italic font-normal shimmer-text">water.</em>
+            <Reveal delay={0.4}>
+              <em className="italic shimmer-text">water.</em>
             </Reveal>
             <br />
-            <Reveal delay={0.4}>Brighter</Reveal>
-            <br />
-            <Reveal delay={0.55}>
-              <em className="italic font-normal text-sun">tomorrows.</em>
+            <Reveal delay={0.6}>Brighter</Reveal>{" "}
+            <Reveal delay={0.8}>
+              <em className="italic text-sun">tomorrows.</em>
             </Reveal>
           </h1>
 
           <motion.p
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ delay: 0.9, duration: 0.8 }}
-            className="max-w-lg text-lg text-muted-foreground leading-relaxed"
+            transition={{ delay: 1.2, duration: 0.9 }}
+            className="max-w-xl text-lg md:text-xl text-foreground/85 leading-relaxed font-light"
           >
-            From the first survey to the final drop — we drill boreholes, install solar systems, and engineer water storage that lasts generations. <span className="text-foreground">Water is life. Solar is power.</span>
+            From the first survey to the final drop — we drill boreholes, install solar systems, and engineer water storage that lasts generations.
           </motion.p>
 
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 1.1, duration: 0.8 }}
-            className="flex flex-wrap items-center gap-4"
+            transition={{ delay: 1.4 }}
+            className="flex flex-wrap items-center gap-5"
           >
-            <a href="#pricing" className="group relative inline-flex items-center gap-2 rounded-full bg-sun px-7 py-4 text-sm font-medium text-primary-foreground shadow-glow hover:scale-[1.03] transition-transform">
+            <a href="#pricing" className="group relative inline-flex items-center gap-2 rounded-full bg-sun px-8 py-4 text-sm font-medium text-primary-foreground shadow-glow hover:scale-[1.03] transition-transform">
               Get a free quote
               <ArrowUpRight className="size-4 group-hover:rotate-45 transition-transform" />
             </a>
             <a href={PHONE_HREF} className="inline-flex items-center gap-3 text-sm text-foreground/90 hover:text-sun transition-colors">
-              <span className="size-10 grid place-items-center rounded-full border border-white/20">
+              <span className="size-11 grid place-items-center rounded-full glass">
                 <Phone className="size-4" />
               </span>
               <span>
-                <span className="block text-[10px] uppercase tracking-[0.2em] text-muted-foreground">Call us</span>
+                <span className="block text-[10px] uppercase tracking-[0.25em] text-muted-foreground">Call us</span>
                 <span className="font-mono-tight">{PHONE}</span>
               </span>
             </a>
@@ -167,8 +207,8 @@ function Hero() {
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ delay: 1.4 }}
-            className="grid grid-cols-3 gap-6 pt-8 max-w-md border-t border-white/10"
+            transition={{ delay: 1.6 }}
+            className="grid grid-cols-3 gap-8 pt-10 max-w-lg border-t border-white/15"
           >
             {[
               { k: "500+", v: "Boreholes drilled" },
@@ -176,53 +216,10 @@ function Hero() {
               { k: "24/7", v: "Support" },
             ].map((s) => (
               <div key={s.k} className="pt-6">
-                <div className="font-display text-3xl text-sun">{s.k}</div>
+                <div className="font-display text-4xl text-sun">{s.k}</div>
                 <div className="text-xs text-muted-foreground mt-1">{s.v}</div>
               </div>
             ))}
-          </motion.div>
-        </motion.div>
-
-        {/* Hero visual */}
-        <motion.div
-          initial={{ opacity: 0, scale: 0.95 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ delay: 0.6, duration: 1.2, ease: [0.22, 1, 0.36, 1] }}
-          className="lg:col-span-5 relative"
-        >
-          <div className="relative aspect-[4/5] rounded-3xl overflow-hidden shadow-deep">
-            <img src={hero.url} alt="Trust technician at borehole" className="absolute inset-0 size-full object-cover" />
-            <div className="absolute inset-0 bg-gradient-to-t from-ink via-ink/30 to-transparent" />
-
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 1.3 }}
-              className="absolute bottom-6 left-6 right-6 glass rounded-2xl p-4 flex items-center gap-3"
-            >
-              <div className="size-10 rounded-full bg-sun grid place-items-center text-primary-foreground">
-                <Zap className="size-4" />
-              </div>
-              <div className="flex-1">
-                <div className="text-xs uppercase tracking-wider text-muted-foreground">Now booking</div>
-                <div className="text-sm">Borehole + Solar packages</div>
-              </div>
-              <ArrowUpRight className="size-4" />
-            </motion.div>
-          </div>
-
-          {/* floating badge */}
-          <motion.div
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 1.5 }}
-            className="absolute -left-6 top-12 glass rounded-2xl p-4 hidden md:block"
-          >
-            <div className="flex items-center gap-2">
-              <ShieldCheck className="size-4 text-sun" />
-              <span className="text-xs uppercase tracking-wider">Certified</span>
-            </div>
-            <div className="font-display text-lg mt-1">10-year guarantee</div>
           </motion.div>
         </motion.div>
       </div>
@@ -230,7 +227,7 @@ function Hero() {
       <motion.div
         animate={{ y: [0, 8, 0] }}
         transition={{ duration: 2, repeat: Infinity }}
-        className="absolute bottom-8 left-1/2 -translate-x-1/2 text-muted-foreground text-xs flex flex-col items-center gap-2"
+        className="absolute bottom-8 left-1/2 -translate-x-1/2 text-muted-foreground text-xs flex flex-col items-center gap-2 z-10"
       >
         <span className="uppercase tracking-[0.3em]">Scroll</span>
         <ChevronDown className="size-4" />
@@ -297,34 +294,38 @@ function Services() {
 }
 
 function ServiceCard({ icon: Icon, title, desc, img, index }: { icon: any; title: string; desc: string; img: string; index: number }) {
-  const [hover, setHover] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+  const { scrollYProgress } = useScroll({ target: ref, offset: ["start end", "end start"] });
+  // Subtle un-zoom: image starts at 1.18 when entering, eases down to ~1 as it scrolls into view
+  const scale = useTransform(scrollYProgress, [0, 0.5, 1], [1.22, 1.02, 1.12]);
+  const y = useTransform(scrollYProgress, [0, 1], ["-6%", "6%"]);
   return (
     <motion.div
+      ref={ref}
       initial={{ opacity: 0, y: 40 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-50px" }}
       transition={{ delay: index * 0.08, duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
-      onHoverStart={() => setHover(true)}
-      onHoverEnd={() => setHover(false)}
-      className="group relative rounded-3xl overflow-hidden bg-card border border-white/5 p-8 aspect-[4/5] flex flex-col justify-between cursor-pointer"
+      className="group relative rounded-3xl overflow-hidden bg-card border border-white/5 aspect-[4/5] flex flex-col justify-between cursor-pointer"
     >
+      {/* Always-visible image with scroll-driven gentle un-zoom */}
       <motion.img
         src={img}
         alt={title}
-        animate={{ opacity: hover ? 0.35 : 0, scale: hover ? 1 : 1.1 }}
-        transition={{ duration: 0.8 }}
-        className="absolute inset-0 size-full object-cover"
+        style={{ scale, y }}
+        className="absolute inset-0 size-full object-cover will-change-transform"
       />
-      <div className="absolute inset-0 bg-gradient-to-t from-card via-card/80 to-transparent opacity-90" />
+      <div className="absolute inset-0 bg-gradient-to-t from-ink via-ink/55 to-ink/10" />
+      <div className="absolute inset-0 bg-gradient-to-br from-transparent via-transparent to-sun/10 opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
 
-      <div className="relative">
-        <div className="inline-flex size-12 items-center justify-center rounded-2xl bg-sun/10 text-sun border border-sun/20 group-hover:bg-sun group-hover:text-primary-foreground transition-all">
+      <div className="relative p-8">
+        <div className="inline-flex size-12 items-center justify-center rounded-2xl glass text-sun group-hover:bg-sun group-hover:text-primary-foreground transition-all">
           <Icon className="size-5" />
         </div>
       </div>
-      <div className="relative space-y-3">
-        <h3 className="font-display text-3xl tracking-tight">{title}</h3>
-        <p className="text-sm text-muted-foreground leading-relaxed">{desc}</p>
+      <div className="relative p-8 space-y-3">
+        <h3 className="font-display text-4xl tracking-tight">{title}</h3>
+        <p className="text-sm text-foreground/80 leading-relaxed max-w-xs">{desc}</p>
         <div className="flex items-center gap-2 text-sm text-sun pt-2">
           <span>Learn more</span>
           <ArrowUpRight className="size-4 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
@@ -487,6 +488,55 @@ function Gallery() {
               <div className="absolute inset-0 bg-gradient-to-t from-ink/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
               <div className="absolute bottom-4 left-4 text-sm font-display opacity-0 group-hover:opacity-100 transition-opacity">
                 {img.label}
+              </div>
+            </motion.div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ---------------- TEAM ---------------- */
+function Team() {
+  const team = [
+    { name: "Tatenda Moyo", role: "Founder & Lead Driller", img: hero.url, bio: "20+ years sinking boreholes across Zimbabwe. Knows every aquifer between Harare and Hwange." },
+    { name: "Rumbi Chikore", role: "Solar Systems Engineer", img: inverter.url, bio: "Designs off-grid solar that keeps homes, clinics and farms running through every load-shed." },
+    { name: "Kuda Mhondoro", role: "Field Operations", img: field.url, bio: "Leads our install crews. The reason jobs finish on time and clean every single time." },
+    { name: "Nyasha Banda", role: "Site Survey Lead", img: truck.url, bio: "Reads the land before we drill. Saves clients thousands by finding water on the first try." },
+  ];
+  return (
+    <section id="team" className="relative py-32 px-6 border-t border-white/5">
+      <div className="mx-auto max-w-7xl">
+        <SectionHeader eyebrow="The people behind Trust" title="Meet the crew." subtitle="Engineers, drillers and field hands who treat every job like it's their own home." />
+
+        <div className="mt-20 grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
+          {team.map((m, i) => (
+            <motion.div
+              key={m.name}
+              initial={{ opacity: 0, y: 40 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-50px" }}
+              transition={{ delay: i * 0.1, duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+              className="group relative rounded-3xl overflow-hidden bg-card border border-white/5 aspect-[3/4]"
+            >
+              <motion.img
+                src={m.img}
+                alt={m.name}
+                initial={{ scale: 1.2 }}
+                whileInView={{ scale: 1.05 }}
+                viewport={{ once: true, margin: "-80px" }}
+                transition={{ duration: 1.4, ease: [0.22, 1, 0.36, 1] }}
+                className="absolute inset-0 size-full object-cover group-hover:scale-110 transition-transform duration-[1400ms]"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-ink via-ink/40 to-transparent" />
+              <div className="absolute inset-x-0 bottom-0 p-6 space-y-2">
+                <div className="text-[10px] uppercase tracking-[0.25em] text-sun">{m.role}</div>
+                <h3 className="font-display text-2xl leading-tight">{m.name}</h3>
+                <p className="text-xs text-foreground/75 leading-relaxed opacity-0 group-hover:opacity-100 max-h-0 group-hover:max-h-32 transition-all duration-500 overflow-hidden">{m.bio}</p>
+              </div>
+              <div className="absolute top-5 left-5 size-9 rounded-full glass grid place-items-center">
+                <Sparkles className="size-3.5 text-sun" />
               </div>
             </motion.div>
           ))}
@@ -664,9 +714,20 @@ function Footer() {
           </ul>
         </div>
       </div>
-      <div className="mx-auto max-w-7xl mt-16 pt-8 border-t border-white/5 flex flex-wrap justify-between gap-4 text-xs text-muted-foreground">
+      <div className="mx-auto max-w-7xl mt-16 pt-8 border-t border-white/5 flex flex-wrap items-center justify-between gap-4 text-xs text-muted-foreground">
         <div>© {new Date().getFullYear()} Trust Borehole & Solar. All rights reserved.</div>
-        <div className="font-mono-tight">Water. Power. Trust.</div>
+        <div className="font-mono-tight">
+          Developed by{" "}
+          <a
+            href="https://digitsdigital.co.zw"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="font-semibold text-[oklch(0.72_0.19_45)] hover:text-sun transition-colors story-link"
+            style={{ color: "#F26B1F" }}
+          >
+            Digits Digital
+          </a>
+        </div>
       </div>
     </footer>
   );
