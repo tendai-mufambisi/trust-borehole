@@ -714,9 +714,20 @@ function Footer() {
           </ul>
         </div>
       </div>
-      <div className="mx-auto max-w-7xl mt-16 pt-8 border-t border-white/5 flex flex-wrap justify-between gap-4 text-xs text-muted-foreground">
+      <div className="mx-auto max-w-7xl mt-16 pt-8 border-t border-white/5 flex flex-wrap items-center justify-between gap-4 text-xs text-muted-foreground">
         <div>© {new Date().getFullYear()} Trust Borehole & Solar. All rights reserved.</div>
-        <div className="font-mono-tight">Water. Power. Trust.</div>
+        <div className="font-mono-tight">
+          Developed by{" "}
+          <a
+            href="https://digitsdigital.co.zw"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="font-semibold text-[oklch(0.72_0.19_45)] hover:text-sun transition-colors story-link"
+            style={{ color: "#F26B1F" }}
+          >
+            Digits Digital
+          </a>
+        </div>
       </div>
     </footer>
   );
