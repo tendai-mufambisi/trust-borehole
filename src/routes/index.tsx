@@ -44,6 +44,7 @@ function Home() {
       <Promo />
       <Process />
       <Gallery />
+      <Team />
       <Pricing />
       <Testimonials />
       <CTA />
