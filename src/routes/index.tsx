@@ -497,6 +497,55 @@ function Gallery() {
   );
 }
 
+/* ---------------- TEAM ---------------- */
+function Team() {
+  const team = [
+    { name: "Tatenda Moyo", role: "Founder & Lead Driller", img: hero.url, bio: "20+ years sinking boreholes across Zimbabwe. Knows every aquifer between Harare and Hwange." },
+    { name: "Rumbi Chikore", role: "Solar Systems Engineer", img: inverter.url, bio: "Designs off-grid solar that keeps homes, clinics and farms running through every load-shed." },
+    { name: "Kuda Mhondoro", role: "Field Operations", img: field.url, bio: "Leads our install crews. The reason jobs finish on time and clean every single time." },
+    { name: "Nyasha Banda", role: "Site Survey Lead", img: truck.url, bio: "Reads the land before we drill. Saves clients thousands by finding water on the first try." },
+  ];
+  return (
+    <section id="team" className="relative py-32 px-6 border-t border-white/5">
+      <div className="mx-auto max-w-7xl">
+        <SectionHeader eyebrow="The people behind Trust" title="Meet the crew." subtitle="Engineers, drillers and field hands who treat every job like it's their own home." />
+
+        <div className="mt-20 grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
+          {team.map((m, i) => (
+            <motion.div
+              key={m.name}
+              initial={{ opacity: 0, y: 40 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-50px" }}
+              transition={{ delay: i * 0.1, duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+              className="group relative rounded-3xl overflow-hidden bg-card border border-white/5 aspect-[3/4]"
+            >
+              <motion.img
+                src={m.img}
+                alt={m.name}
+                initial={{ scale: 1.2 }}
+                whileInView={{ scale: 1.05 }}
+                viewport={{ once: true, margin: "-80px" }}
+                transition={{ duration: 1.4, ease: [0.22, 1, 0.36, 1] }}
+                className="absolute inset-0 size-full object-cover group-hover:scale-110 transition-transform duration-[1400ms]"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-ink via-ink/40 to-transparent" />
+              <div className="absolute inset-x-0 bottom-0 p-6 space-y-2">
+                <div className="text-[10px] uppercase tracking-[0.25em] text-sun">{m.role}</div>
+                <h3 className="font-display text-2xl leading-tight">{m.name}</h3>
+                <p className="text-xs text-foreground/75 leading-relaxed opacity-0 group-hover:opacity-100 max-h-0 group-hover:max-h-32 transition-all duration-500 overflow-hidden">{m.bio}</p>
+              </div>
+              <div className="absolute top-5 left-5 size-9 rounded-full glass grid place-items-center">
+                <Sparkles className="size-3.5 text-sun" />
+              </div>
+            </motion.div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
 /* ---------------- PRICING ---------------- */
 function Pricing() {
   const tiers = [
