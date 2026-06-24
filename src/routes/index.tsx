@@ -294,34 +294,38 @@ function Services() {
 }
 
 function ServiceCard({ icon: Icon, title, desc, img, index }: { icon: any; title: string; desc: string; img: string; index: number }) {
-  const [hover, setHover] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+  const { scrollYProgress } = useScroll({ target: ref, offset: ["start end", "end start"] });
+  // Subtle un-zoom: image starts at 1.18 when entering, eases down to ~1 as it scrolls into view
+  const scale = useTransform(scrollYProgress, [0, 0.5, 1], [1.22, 1.02, 1.12]);
+  const y = useTransform(scrollYProgress, [0, 1], ["-6%", "6%"]);
   return (
     <motion.div
+      ref={ref}
       initial={{ opacity: 0, y: 40 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-50px" }}
       transition={{ delay: index * 0.08, duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
-      onHoverStart={() => setHover(true)}
-      onHoverEnd={() => setHover(false)}
-      className="group relative rounded-3xl overflow-hidden bg-card border border-white/5 p-8 aspect-[4/5] flex flex-col justify-between cursor-pointer"
+      className="group relative rounded-3xl overflow-hidden bg-card border border-white/5 aspect-[4/5] flex flex-col justify-between cursor-pointer"
     >
+      {/* Always-visible image with scroll-driven gentle un-zoom */}
       <motion.img
         src={img}
         alt={title}
-        animate={{ opacity: hover ? 0.35 : 0, scale: hover ? 1 : 1.1 }}
-        transition={{ duration: 0.8 }}
-        className="absolute inset-0 size-full object-cover"
+        style={{ scale, y }}
+        className="absolute inset-0 size-full object-cover will-change-transform"
       />
-      <div className="absolute inset-0 bg-gradient-to-t from-card via-card/80 to-transparent opacity-90" />
+      <div className="absolute inset-0 bg-gradient-to-t from-ink via-ink/55 to-ink/10" />
+      <div className="absolute inset-0 bg-gradient-to-br from-transparent via-transparent to-sun/10 opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
 
-      <div className="relative">
-        <div className="inline-flex size-12 items-center justify-center rounded-2xl bg-sun/10 text-sun border border-sun/20 group-hover:bg-sun group-hover:text-primary-foreground transition-all">
+      <div className="relative p-8">
+        <div className="inline-flex size-12 items-center justify-center rounded-2xl glass text-sun group-hover:bg-sun group-hover:text-primary-foreground transition-all">
           <Icon className="size-5" />
         </div>
       </div>
-      <div className="relative space-y-3">
-        <h3 className="font-display text-3xl tracking-tight">{title}</h3>
-        <p className="text-sm text-muted-foreground leading-relaxed">{desc}</p>
+      <div className="relative p-8 space-y-3">
+        <h3 className="font-display text-4xl tracking-tight">{title}</h3>
+        <p className="text-sm text-foreground/80 leading-relaxed max-w-xs">{desc}</p>
         <div className="flex items-center gap-2 text-sm text-sun pt-2">
           <span>Learn more</span>
           <ArrowUpRight className="size-4 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
