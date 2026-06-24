@@ -39,9 +39,9 @@
   --color-sun-glow: var(--sun-glow);
   --color-earth: var(--earth);
 
-  --font-display: "Fraunces", "Times New Roman", serif;
-  --font-sans: "Inter Tight", system-ui, sans-serif;
-  --font-mono: "JetBrains Mono", monospace;
+  --font-display: "Instrument Serif", "Times New Roman", serif;
+  --font-sans: "Geist", system-ui, sans-serif;
+  --font-mono: "Geist Mono", ui-monospace, monospace;
 }
 
 :root {
