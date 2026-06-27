@@ -1,21 +1,21 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { motion, useScroll, useTransform } from "motion/react";
-import { useRef } from "react";
+import { motion, useMotionValueEvent, useScroll, useTransform } from "motion/react";
+import { useRef, useState } from "react";
 import {
   Droplets, Sun, Wrench, Gauge, ShieldCheck, Phone, ArrowUpRight,
   Sparkles, MapPin, Clock, CheckCircle2, ChevronDown, Zap, Waves,
 } from "lucide-react";
 
-import hero from "@/assets/trust-727465.json";
-import grid1 from "@/assets/trust-697066.json";
-import tanks from "@/assets/trust-700908.json";
-import field from "@/assets/trust-700997.json";
-import truck from "@/assets/trust-705031.json";
-import rig from "@/assets/trust-715478.json";
-import promo from "@/assets/trust-718816.json";
-import inverter from "@/assets/trust-721290.json";
-import solarPole from "@/assets/trust-722364.json";
-import family from "@/assets/trust-727491.json";
+const hero      = { url: "/images/ourcar.jpg" };
+const grid1     = { url: "/images/grid1.jpg" };
+const tanks     = { url: "/images/tanks.jpg" };
+const field     = { url: "/images/in_the_field.jpg" };
+const truck     = { url: "/images/ourcar.jpg" };
+const rig       = { url: "/images/rig.jpg" };
+const promo     = { url: "/images/promo.jpg" };
+const inverter  = { url: "/images/solar_system.jpg" };
+const solarPole = { url: "/images/solar_pole.jpg" };
+const family    = { url: "/images/family.jpg" };
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -55,14 +55,24 @@ function Home() {
 
 /* ---------------- NAV ---------------- */
 function Nav() {
+  const { scrollY } = useScroll();
+  const [scrolled, setScrolled] = useState(false);
+
+  useMotionValueEvent(scrollY, "change", (y) => setScrolled(y > 60));
+
   return (
     <motion.header
       initial={{ y: -40, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
       transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
-      className="fixed top-0 inset-x-0 z-50"
+      className={[
+        "fixed top-0 inset-x-0 z-50 transition-all duration-500",
+        scrolled
+          ? "bg-ink/90 backdrop-blur-xl border-b border-white/10 shadow-[0_8px_32px_-8px_oklch(0.1_0.05_240/0.6)]"
+          : "bg-ink/40 backdrop-blur-md border-b border-white/5",
+      ].join(" ")}
     >
-      <div className="mx-auto max-w-7xl px-6 py-5 flex items-center justify-between">
+      <div className="mx-auto max-w-7xl px-6 py-4 flex items-center justify-between">
         <a href="#top" className="flex items-center gap-2.5 group">
           <div className="relative">
             <div className="absolute inset-0 bg-sun rounded-full blur-md opacity-60 group-hover:opacity-100 transition-opacity" />
@@ -71,19 +81,19 @@ function Nav() {
             </div>
           </div>
           <div className="leading-none">
-            <div className="font-display text-xl tracking-tight">Trust</div>
-            <div className="text-[10px] uppercase tracking-[0.25em] text-muted-foreground">Borehole & Solar</div>
+            <div className="font-display text-xl tracking-tight text-paper">Trust</div>
+            <div className="text-[10px] uppercase tracking-[0.25em] text-paper/50">Borehole & Solar</div>
           </div>
         </a>
-        <nav className="hidden md:flex items-center gap-8 text-sm text-muted-foreground">
+        <nav className="hidden md:flex items-center gap-8 text-sm text-paper/75">
           {["Services", "Process", "Gallery", "Pricing"].map((l) => (
-            <a key={l} href={`#${l.toLowerCase()}`} className="relative hover:text-foreground transition-colors group">
+            <a key={l} href={`#${l.toLowerCase()}`} className="relative hover:text-sun transition-colors duration-200 group">
               {l}
               <span className="absolute -bottom-1 left-0 h-px w-0 bg-sun group-hover:w-full transition-all duration-500" />
             </a>
           ))}
         </nav>
-        <a href={PHONE_HREF} className="group relative inline-flex items-center gap-2 rounded-full bg-sun px-5 py-2.5 text-sm font-medium text-primary-foreground hover:scale-[1.03] transition-transform">
+        <a href={PHONE_HREF} className="group relative inline-flex items-center gap-2 rounded-full bg-sun px-5 py-2.5 text-sm font-semibold text-ink hover:scale-[1.03] transition-transform shadow-glow">
           <Phone className="size-3.5" />
           <span className="hidden sm:inline">Call now</span>
           <span className="sm:hidden">Call</span>
