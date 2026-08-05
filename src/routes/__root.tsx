@@ -77,19 +77,24 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Trust Borehole & Solar — Water. Power. Trust." },
-      { name: "description", content: "Zimbabwe's most trusted borehole drilling, solar installation and water storage company. From survey to maintenance — we power your future." },
-      { property: "og:title", content: "Trust Borehole & Solar — Water. Power. Trust." },
-      { property: "og:description", content: "Zimbabwe's most trusted borehole drilling, solar installation and water storage company. From survey to maintenance — we power your future." },
+      { title: "Trust Borehole & Solar — Water is Life. Solar is Power." },
+      { name: "description", content: "Trust Borehole and Solar — borehole survey, drilling, development, tank and solar installation across Zimbabwe. Based in Belvedere, Harare. Call +263 77 694 7378." },
+      { name: "theme-color", content: "#0b1a33" },
+      { property: "og:title", content: "Trust Borehole & Solar — Water is Life. Solar is Power." },
+      { property: "og:description", content: "Borehole survey, drilling, development, tank and solar installation across Zimbabwe. Survey from $80 · Drilling from $500 · Tanks from $120." },
       { property: "og:type", content: "website" },
+      { property: "og:site_name", content: "Trust Borehole and Solar" },
       { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:title", content: "Trust Borehole & Solar — Water. Power. Trust." },
-      { name: "twitter:description", content: "Zimbabwe's most trusted borehole drilling, solar installation and water storage company. From survey to maintenance — we power your future." },
-      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/1e27cf76-0f3b-4d88-ac4c-63a37dad1894/id-preview-1125d198--54c73efa-7c54-4c26-8809-137455df9941.lovable.app-1782255194444.png" },
-      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/1e27cf76-0f3b-4d88-ac4c-63a37dad1894/id-preview-1125d198--54c73efa-7c54-4c26-8809-137455df9941.lovable.app-1782255194444.png" },
+      { name: "twitter:title", content: "Trust Borehole & Solar — Water is Life. Solar is Power." },
+      { name: "twitter:description", content: "Borehole survey, drilling, development, tank and solar installation across Zimbabwe. Survey from $80 · Drilling from $500 · Tanks from $120." },
+      { property: "og:image", content: "/images/hero-tanks.jpg" },
+      { name: "twitter:image", content: "/images/hero-tanks.jpg" },
     ],
     links: [
       { rel: "stylesheet", href: appCss },
+      { rel: "icon", href: "/favicon.ico", sizes: "any" },
+      { rel: "icon", type: "image/png", href: "/images/icon-256.png" },
+      { rel: "apple-touch-icon", href: "/images/apple-touch-icon.png" },
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
       // Preload the Google Fonts CSS so the font-face declarations parse ASAP
@@ -98,23 +103,14 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         as: "style",
         href: "https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Geist:wght@300;400;500;600;700&family=Geist+Mono:wght@400;500&display=swap",
       },
-      // Preload the two most-used woff2 files (Geist 400 + Instrument Serif regular)
-      // to eliminate the FOIT/CLS on the hero headline + body copy.
+      // Preload the most-used woff2 (Geist 400) to cut FOIT/CLS on body copy.
       {
         rel: "preload",
         as: "font",
         type: "font/woff2",
         href: "https://fonts.gstatic.com/s/geist/v3/gyByhwUxId8gMEwcGFWNOITddY4.woff2",
         crossOrigin: "anonymous",
-        fetchpriority: "high",
-      },
-      {
-        rel: "preload",
-        as: "font",
-        type: "font/woff2",
-        href: "https://fonts.gstatic.com/s/instrumentserif/v4/jizDREVItHgc8qDIbSTKq4XIRRl5xQ.woff2",
-        crossOrigin: "anonymous",
-        fetchpriority: "high",
+        fetchPriority: "high",
       },
       {
         rel: "stylesheet",
