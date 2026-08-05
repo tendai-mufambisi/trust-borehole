@@ -24,7 +24,6 @@ const img = {
   hilux: "/images/hilux-branded.jpg",
   equipment: "/images/solar-equipment.jpg",
   wip: "/images/work-in-progress.jpg",
-  trench: "/images/trench-work.jpg",
   technician: "/images/technician-portrait.jpg",
 };
 
@@ -628,7 +627,7 @@ function About() {
               transition={{ delay: 0.25, duration: 0.8 }}
               className="absolute -bottom-8 -right-4 sm:-right-8 w-40 sm:w-56 rounded-2xl overflow-hidden border-4 border-ink shadow-deep aspect-square"
             >
-              <img src={img.trench} alt="Trust crew digging the pipe trench on site" className="size-full object-cover" />
+              <img src={img.wip} alt="Trust crew raising a tank and solar panels on site" className="size-full object-cover" />
             </motion.div>
 
             <motion.div
@@ -959,8 +958,7 @@ function Gallery() {
     { url: img.wip, span: "md:col-span-2", label: "Work in progress · Sandton, Hampden" },
     { url: img.twinTanks, span: "", label: "Twin 5,000L tanks" },
     { url: img.hilux, span: "", label: "On the road" },
-    { url: img.solarArray, span: "md:col-span-2", label: "Solar array & pump install" },
-    { url: img.trench, span: "", label: "Trenching the pipe run" },
+    { url: img.solarArray, span: "", label: "Solar array & pump install" },
     { url: img.equipment, span: "", label: "Inverter & controller kit" },
   ];
 
