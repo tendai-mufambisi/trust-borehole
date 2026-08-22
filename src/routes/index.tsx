@@ -48,7 +48,7 @@ export const Route = createFileRoute("/")({
       {
         name: "description",
         content:
-          "Trust Borehole and Solar — borehole survey, drilling, development, tank & solar installation across Zimbabwe. Survey from $80. Drilling from $500. Tanks from $120. Call +263 77 694 7378.",
+          "Trust Borehole and Solar — borehole survey, drilling, development, tank & solar installation across Zimbabwe. Survey from $80. Drilling from $750. Tanks from $120. Call +263 77 694 7378.",
       },
       { property: "og:title", content: "Trust Borehole & Solar" },
       { property: "og:description", content: "Water is life. Solar is power. Trust is our name." },
@@ -1007,7 +1007,7 @@ function Pricing() {
     },
     {
       name: "Borehole Drilling",
-      price: "from $500",
+      price: "from $750",
       desc: "Full drilling, casing and capping. Our most requested package.",
       features: ["Modern rig drilling", "Casing & capping", "Borehole development", "Workmanship guarantee"],
       cta: "Get started",
