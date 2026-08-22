@@ -871,7 +871,7 @@ function Promo() {
               </h3>
               <div className="mt-8 flex items-baseline gap-3">
                 <span className="text-sm text-muted-foreground">from</span>
-                <span className="font-display text-6xl sm:text-7xl text-sun">$500</span>
+                <span className="font-display text-6xl sm:text-7xl text-sun">$750</span>
               </div>
               <div className="mt-2 text-sm text-muted-foreground">
                 + Survey from <span className="text-foreground font-medium">$80</span> · Final price confirmed after your site survey.
