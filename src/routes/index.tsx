@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import {
-  AnimatePresence, motion, useInView, useMotionValueEvent, useScroll, useSpring, useTransform,
+  AnimatePresence, motion, useAnimationFrame, useInView, useMotionValue, useMotionValueEvent,
+  useScroll, useSpring, useTransform, useVelocity,
   type MotionValue,
 } from "motion/react";
 import { useEffect, useRef, useState } from "react";
@@ -1803,11 +1804,6 @@ function StoryChapter({
 
 /* Two rows of project photos sliding in opposite directions, at different speeds */
 function ProjectFilmstrip() {
-  const ref = useRef<HTMLElement>(null);
-  const { scrollYProgress } = useScroll({ target: ref, offset: ["start end", "end start"] });
-  const x1 = useTransform(scrollYProgress, [0, 1], ["0%", "-30%"]);
-  const x2 = useTransform(scrollYProgress, [0, 1], ["-24%", "0%"]);
-
   const row1 = [
     { src: uz.truckRoad, label: "On the road" },
     { src: uz.panelCarry, label: "Carrying the array" },
@@ -1826,7 +1822,7 @@ function ProjectFilmstrip() {
   ];
 
   return (
-    <section ref={ref} className="relative py-20 md:py-28 overflow-hidden border-y border-white/5 bg-card/30">
+    <section className="relative py-20 md:py-28 overflow-hidden border-y border-white/5 bg-card/30">
       <div className="mx-auto max-w-7xl px-6 mb-10 flex flex-wrap items-end justify-between gap-4">
         <div>
           <Eyebrow>From the site</Eyebrow>
@@ -1843,24 +1839,78 @@ function ProjectFilmstrip() {
       </div>
 
       <div className="space-y-4">
-        {[{ row: row1, x: x1 }, { row: row2, x: x2 }].map(({ row, x }, r) => (
-          <motion.div key={r} style={{ x }} className="flex gap-4 w-max px-4 will-change-transform">
-            {row.map((t, i) => (
-              <div
-                key={i}
-                className="group relative w-[64vw] sm:w-[40vw] lg:w-[24vw] aspect-[4/3] shrink-0 overflow-hidden rounded-2xl border border-white/5"
-              >
-                <Photo src={t.src} alt={t.label} className="size-full" imgClassName="group-hover:scale-110" />
-                <div className="absolute inset-0 bg-gradient-to-t from-ink/85 via-transparent to-transparent opacity-60 group-hover:opacity-100 transition-opacity duration-500" />
-                <div className="absolute bottom-3 left-4 font-display text-lg text-paper translate-y-2 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-500">
-                  {t.label}
-                </div>
-              </div>
-            ))}
-          </motion.div>
-        ))}
+        <MarqueeRow items={row1} direction={-1} speed={40} />
+        <MarqueeRow items={row2} direction={1} speed={28} />
       </div>
     </section>
+  );
+}
+
+/* An endless row that drifts on its own, speeds up with page scroll and can be dragged or swiped */
+function MarqueeRow({
+  items, direction, speed,
+}: { items: { src: string; label: string }[]; direction: 1 | -1; speed: number }) {
+  const trackRef = useRef<HTMLDivElement>(null);
+  const x = useMotionValue(0);
+  const { scrollY } = useScroll();
+  const scrollVelocity = useSpring(useVelocity(scrollY), { damping: 50, stiffness: 400 });
+  const drag = useRef<{ lastX: number } | null>(null);
+  const hovering = useRef(false);
+
+  // The track holds the items twice, so wrapping by half its width is seamless
+  const wrap = (v: number) => {
+    const half = (trackRef.current?.scrollWidth ?? 0) / 2;
+    if (!half) return v;
+    const r = v % half;
+    return r > 0 ? r - half : r;
+  };
+
+  useAnimationFrame((_, delta) => {
+    if (drag.current) return;
+    const dt = Math.min(delta, 64) / 1000;
+    const drift = speed * (hovering.current ? 0.25 : 1);
+    // Scrolling down pushes each row along its own direction; scrolling up pushes it back
+    const push = scrollVelocity.get() * 0.35;
+    x.set(wrap(x.get() + direction * (drift + push) * dt));
+  });
+
+  return (
+    <motion.div
+      ref={trackRef}
+      style={{ x }}
+      className="flex w-max cursor-grab active:cursor-grabbing select-none touch-pan-y will-change-transform"
+      onPointerEnter={(e) => { if (e.pointerType === "mouse") hovering.current = true; }}
+      onPointerLeave={() => { hovering.current = false; drag.current = null; }}
+      onPointerDown={(e) => {
+        drag.current = { lastX: e.clientX };
+        e.currentTarget.setPointerCapture(e.pointerId);
+      }}
+      onPointerMove={(e) => {
+        if (!drag.current) return;
+        const dx = e.clientX - drag.current.lastX;
+        drag.current.lastX = e.clientX;
+        x.set(wrap(x.get() + dx));
+      }}
+      onPointerUp={() => { drag.current = null; }}
+      onPointerCancel={() => { drag.current = null; }}
+    >
+      {[...items, ...items].map((t, i) => (
+        <div key={i} className="shrink-0 pr-4">
+          <div className="group relative w-[64vw] sm:w-[40vw] lg:w-[24vw] aspect-[4/3] overflow-hidden rounded-2xl border border-white/5">
+            <Photo
+              src={t.src}
+              alt={i < items.length ? t.label : ""}
+              className="size-full"
+              imgClassName="group-hover:scale-110 pointer-events-none"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-ink/85 via-transparent to-transparent opacity-60 group-hover:opacity-100 transition-opacity duration-500" />
+            <div className="absolute bottom-3 left-4 font-display text-lg text-paper translate-y-2 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-500">
+              {t.label}
+            </div>
+          </div>
+        </div>
+      ))}
+    </motion.div>
   );
 }
 
