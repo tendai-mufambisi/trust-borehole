@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { SITE_URL } from "@/lib/site";
 import {
   AnimatePresence, motion, useAnimationFrame, useInView, useMotionValue, useMotionValueEvent,
   useScroll, useSpring, useTransform, useVelocity,
@@ -86,11 +87,8 @@ export const Route = createFileRoute("/")({
         content:
           "Trust Borehole and Solar — borehole survey, drilling, development, tank & solar installation and high-pressure irrigation across Zimbabwe. Survey from $80. Drilling from $750. Tanks from $120. Call +263 77 694 7378.",
       },
-      { property: "og:title", content: "Trust Borehole & Solar" },
-      { property: "og:description", content: "Water is life. Solar is power. Trust is our name." },
-      { property: "og:image", content: img.heroTanks },
     ],
-    links: [{ rel: "canonical", href: "/" }],
+    links: [{ rel: "canonical", href: `${SITE_URL}/` }],
   }),
   component: Home,
 });

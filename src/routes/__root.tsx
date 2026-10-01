@@ -1,4 +1,5 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { SITE_URL } from "@/lib/site";
 import {
   Outlet,
   Link,
@@ -87,8 +88,15 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:title", content: "Trust Borehole & Solar — Water is Life. Solar is Power." },
       { name: "twitter:description", content: "Borehole survey, drilling, development, tank and solar installation across Zimbabwe. Survey from $80 · Drilling from $750 · Tanks from $120." },
-      { property: "og:image", content: "/images/hero-tanks.jpg" },
-      { name: "twitter:image", content: "/images/hero-tanks.jpg" },
+      // Link previews (WhatsApp, Facebook, X) only accept absolute image URLs
+      { property: "og:url", content: SITE_URL },
+      { property: "og:image", content: `${SITE_URL}/images/og-image.jpg` },
+      { property: "og:image:secure_url", content: `${SITE_URL}/images/og-image.jpg` },
+      { property: "og:image:type", content: "image/jpeg" },
+      { property: "og:image:width", content: "1200" },
+      { property: "og:image:height", content: "630" },
+      { property: "og:image:alt", content: "Trust Borehole and Solar drilling crew at work — Water is life. Solar is power." },
+      { name: "twitter:image", content: `${SITE_URL}/images/og-image.jpg` },
     ],
     links: [
       { rel: "stylesheet", href: appCss },
