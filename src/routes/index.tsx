@@ -1,10 +1,14 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { AnimatePresence, motion, useMotionValueEvent, useScroll, useTransform } from "motion/react";
+import {
+  AnimatePresence, motion, useInView, useMotionValueEvent, useScroll, useSpring, useTransform,
+  type MotionValue,
+} from "motion/react";
 import { useEffect, useRef, useState } from "react";
 import {
   Droplets, Sun, Wrench, Gauge, ShieldCheck, Phone, ArrowUpRight,
   Sparkles, MapPin, Clock, CheckCircle2, ChevronDown, Waves, Mail,
   Menu, X, Users, Leaf, Search, Hammer, Container, GlassWater,
+  Sprout, House, Truck,
 } from "lucide-react";
 
 /* ---------------- BRAND ASSETS ---------------- */
@@ -25,6 +29,36 @@ const img = {
   equipment: "/images/solar-equipment.jpg",
   wip: "/images/work-in-progress.jpg",
   technician: "/images/technician-portrait.jpg",
+  drillingRig: "/images/drilling-rig.jpg",
+  waterStrike: "/images/water-strike.jpg",
+  engineerWalk: "/images/engineer-walk.jpg",
+  irrigationFlyer: "/images/irrigation-flyer.jpg",
+  brandSolarHome: "/images/brand-solar-home.jpg",
+  brandIrrigation: "/images/brand-irrigation.jpg",
+  drillingCrew: "/images/drilling-crew.jpg",
+  boreholeGush: "/images/borehole-gush.jpg",
+  irrigationRural: "/images/irrigation-rural-flyer.jpg",
+  irrigationFlow: "/images/irrigation-pump-flow.jpg",
+  solarPumpCanal: "/images/solar-pump-canal.jpg",
+};
+
+/* Featured project — Uzumba-Maramba-Pfungwe, September 2026 */
+const uz = {
+  truckRoad: "/images/uzumba/truck-road.jpg",
+  truckLoaded: "/images/uzumba/truck-loaded.jpg",
+  panelCarry: "/images/uzumba/panel-carry.jpg",
+  community: "/images/uzumba/community.jpg",
+  communityWide: "/images/uzumba/community-wide.jpg",
+  towerCrew: "/images/uzumba/tower-crew.jpg",
+  towerPlumbing: "/images/uzumba/tower-plumbing.jpg",
+  complete: "/images/uzumba/complete.jpg",
+};
+
+const video = {
+  technician: "/video/technician.mp4",
+  technicianPoster: "/video/technician-poster.jpg",
+  rig: "/video/rig-on-site.mp4",
+  rigPoster: "/video/rig-on-site-poster.jpg",
 };
 
 /* ---------------- CONTACT ---------------- */
@@ -36,6 +70,7 @@ const WA_TEXT = encodeURIComponent(
   "Hi Trust Borehole & Solar 👋 I'd like a quote for a borehole / solar installation.",
 );
 const WA_LINK = `https://wa.me/${WA_NUMBER}?text=${WA_TEXT}`;
+const waWith = (text: string) => `https://wa.me/${WA_NUMBER}?text=${encodeURIComponent(text)}`;
 const ADDRESS = "Eastcoat, Belvedere · Harare, Zimbabwe";
 
 /* Developer credit */
@@ -48,7 +83,7 @@ export const Route = createFileRoute("/")({
       {
         name: "description",
         content:
-          "Trust Borehole and Solar — borehole survey, drilling, development, tank & solar installation across Zimbabwe. Survey from $80. Drilling from $750. Tanks from $120. Call +263 77 694 7378.",
+          "Trust Borehole and Solar — borehole survey, drilling, development, tank & solar installation and high-pressure irrigation across Zimbabwe. Survey from $80. Drilling from $750. Tanks from $120. Call +263 77 694 7378.",
       },
       { property: "og:title", content: "Trust Borehole & Solar" },
       { property: "og:description", content: "Water is life. Solar is power. Trust is our name." },
@@ -63,15 +98,24 @@ function Home() {
   return (
     <div className="grain min-h-screen overflow-x-clip">
       <PageLoader />
+      <ScrollProgress />
       <Nav />
       <Hero />
       <Marquee />
       <About />
+      <WaterStrikeBand />
       <Services />
       <Promo />
+      <ProjectIntroBand />
+      <UzumbaStory />
+      <ProjectFilmstrip />
+      <TrustFamily />
+      <Irrigation />
       <Process />
+      <RoadBand />
       <Gallery />
       <Pricing />
+      <ManifestoBand />
       <CTA />
       <Footer />
       <WhatsAppWidget />
@@ -208,7 +252,8 @@ function PageLoader() {
 const NAV_LINKS = [
   { label: "About", href: "#about" },
   { label: "Services", href: "#services" },
-  { label: "Process", href: "#process" },
+  { label: "Projects", href: "#projects" },
+  { label: "Irrigation", href: "#irrigation" },
   { label: "Gallery", href: "#gallery" },
   { label: "Pricing", href: "#pricing" },
   { label: "Contact", href: "#contact" },
@@ -257,7 +302,7 @@ function Nav() {
             </div>
           </a>
 
-          <nav className="hidden lg:flex items-center gap-7 text-sm text-paper/75">
+          <nav className="hidden lg:flex items-center gap-6 text-sm text-paper/75">
             {NAV_LINKS.map((l) => (
               <a
                 key={l.label}
@@ -382,6 +427,7 @@ const HERO_SLIDES = [
   { src: img.heroTanks, alt: "Trust technician commissioning twin water storage tanks on a steel stand" },
   { src: img.heroSolar, alt: "Solar array powering a borehole pump on a Trust installation site" },
   { src: img.heroBindura, alt: "Solar powered borehole installed by Trust in Bindura" },
+  { src: uz.community, alt: "Community gathered as Trust installs a solar borehole in Uzumba-Maramba-Pfungwe" },
 ];
 
 function Hero() {
@@ -455,18 +501,20 @@ function Hero() {
       {/* Content */}
       <div className="relative z-10 mx-auto max-w-7xl px-6 pt-32 pb-24 min-h-[100svh] flex flex-col justify-center">
         <motion.div style={{ y: textY, opacity: textOpacity }} className="max-w-4xl space-y-8">
-          <h1 className="font-display font-normal text-[clamp(3rem,10vw,9rem)] leading-[0.9] tracking-[-0.025em] text-balance">
-            <Reveal delay={2.3}>Reliable</Reveal>
-            <br />
-            <Reveal delay={2.45}>
-              <em className="italic shimmer-text">water.</em>
-            </Reveal>
-            <br />
-            <Reveal delay={2.6}>Brighter</Reveal>{" "}
-            <Reveal delay={2.75}>
-              <em className="italic text-sun">tomorrows.</em>
-            </Reveal>
-          </h1>
+          <motion.div
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 2.2, duration: 0.7 }}
+            className="inline-flex items-center gap-2.5 rounded-full glass px-4 py-2 text-[11px] uppercase tracking-[0.28em] text-paper/80"
+          >
+            <span className="relative flex size-2">
+              <span className="absolute inset-0 rounded-full bg-sun wa-pulse" />
+              <span className="relative size-2 rounded-full bg-sun" />
+            </span>
+            Trust Borehole &amp; Solar · Zimbabwe
+          </motion.div>
+
+          <TaglineRotator />
 
           <motion.p
             initial={{ opacity: 0 }}
@@ -484,15 +532,18 @@ function Hero() {
             transition={{ delay: 3.25 }}
             className="flex flex-wrap items-center gap-4 sm:gap-5"
           >
-            <a
-              href={WA_LINK}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="group relative inline-flex items-center gap-2 rounded-full bg-sun px-7 sm:px-8 py-4 text-sm font-medium text-primary-foreground shadow-glow hover:scale-[1.03] transition-transform"
-            >
-              Get a free quote
-              <ArrowUpRight className="size-4 group-hover:rotate-45 transition-transform" />
-            </a>
+            <Magnetic>
+              <a
+                href={WA_LINK}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group relative inline-flex items-center gap-2 overflow-hidden rounded-full bg-sun px-7 sm:px-8 py-4 text-sm font-medium text-primary-foreground shadow-glow active:scale-95 transition-transform"
+              >
+                <span className="absolute inset-0 -translate-x-full bg-white/30 skew-x-12 group-hover:translate-x-full transition-transform duration-700" />
+                <span className="relative">Get a free quote</span>
+                <ArrowUpRight className="relative size-4 group-hover:rotate-45 transition-transform" />
+              </a>
+            </Magnetic>
             <a
               href={PHONE_HREF}
               className="inline-flex items-center gap-3 text-sm text-foreground/90 hover:text-sun transition-colors"
@@ -527,8 +578,32 @@ function Hero() {
         </motion.div>
       </div>
 
+      {/* Floating "latest project" card */}
+      <motion.a
+        href="#projects"
+        initial={{ opacity: 0, y: 40, scale: 0.92 }}
+        animate={{ opacity: 1, y: 0, scale: 1 }}
+        transition={{ delay: 3.6, duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
+        className="group absolute right-8 xl:right-12 top-[34%] z-10 hidden lg:block"
+      >
+        <div className="float-slow flex items-center gap-4 rounded-2xl glass p-3 pr-5 backdrop-blur-xl shadow-deep group-hover:border-sun/40 transition-colors">
+          <div className="relative size-20 overflow-hidden rounded-xl">
+            <img src={uz.complete} alt="" className="size-full object-cover group-hover:scale-110 transition-transform duration-700" />
+          </div>
+          <div className="max-w-[13rem]">
+            <div className="flex items-center gap-1.5 text-[10px] uppercase tracking-[0.25em] text-sun">
+              <span className="size-1.5 rounded-full bg-[#25D366]" /> Latest project
+            </div>
+            <div className="mt-1 font-display text-xl leading-tight text-paper">Uzumba-Maramba-Pfungwe</div>
+            <div className="mt-1 flex items-center gap-1 text-xs text-paper/60 group-hover:text-sun transition-colors">
+              Read the story <ArrowUpRight className="size-3.5 group-hover:rotate-45 transition-transform" />
+            </div>
+          </div>
+        </div>
+      </motion.a>
+
       {/* Slide dots */}
-      <div className="absolute bottom-8 right-6 z-10 hidden sm:flex items-center gap-2">
+      <div className="absolute bottom-8 right-6 lg:right-auto lg:left-6 z-10 hidden sm:flex items-center gap-2">
         {HERO_SLIDES.map((_, i) => (
           <button
             key={i}
@@ -554,18 +629,179 @@ function Hero() {
   );
 }
 
-function Reveal({ children, delay = 0 }: { children: React.ReactNode; delay?: number }) {
+/* Rotating brand promise — each line's words rise in, then lift out */
+const TAGLINES = [
+  { lead: "Water", rest: "is life.", tone: "shimmer-text", icon: Droplets },
+  { lead: "Solar", rest: "is power.", tone: "text-sun", icon: Sun },
+  { lead: "Trust", rest: "is our name.", tone: "text-water", icon: ShieldCheck },
+];
+const TAGLINE_HOLD = 4200;
+
+const wordVariants = {
+  hidden: { y: "115%", rotate: 6 },
+  show: { y: 0, rotate: 0, transition: { duration: 0.85, ease: [0.22, 1, 0.36, 1] as const } },
+  exit: { y: "-115%", rotate: -4, transition: { duration: 0.5, ease: [0.64, 0, 0.78, 0] as const } },
+};
+
+function TaglineRotator() {
+  const [index, setIndex] = useState(0);
+  const [started, setStarted] = useState(false);
+
+  // Wait for the page loader's curtains to open before the first line rises
+  useEffect(() => {
+    const t = setTimeout(() => setStarted(true), 2300);
+    return () => clearTimeout(t);
+  }, []);
+
+  useEffect(() => {
+    if (!started) return;
+    const t = setTimeout(() => setIndex((n) => (n + 1) % TAGLINES.length), TAGLINE_HOLD);
+    return () => clearTimeout(t);
+  }, [index, started]);
+
+  const line = TAGLINES[index];
+
   return (
-    <span className="inline-block overflow-hidden align-bottom">
-      <motion.span
-        initial={{ y: "110%" }}
-        animate={{ y: 0 }}
-        transition={{ delay, duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
-        className="inline-block"
+    <div className="space-y-6">
+      <h1
+        aria-label="Water is life. Solar is power. Trust is our name."
+        className="font-display font-normal text-[clamp(3.4rem,11vw,9.5rem)] leading-[0.92] tracking-[-0.025em] min-h-[1.9em]"
       >
+        <AnimatePresence mode="wait">
+          {started && (
+            <motion.span
+              key={index}
+              aria-hidden
+              className="block"
+              initial="hidden"
+              animate="show"
+              exit="exit"
+              variants={{
+                show: { transition: { staggerChildren: 0.09 } },
+                exit: { transition: { staggerChildren: 0.05 } },
+              }}
+            >
+              <span className="block">
+                <Word>{line.lead}</Word>
+              </span>
+              <span className="block">
+                {line.rest.split(" ").map((w, i) => (
+                  <Word key={i} className={`italic ${line.tone}`}>{w}</Word>
+                ))}
+              </span>
+            </motion.span>
+          )}
+        </AnimatePresence>
+      </h1>
+
+      {/* Tabs double as a progress indicator for the rotation */}
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 2.6 }}
+        className="flex items-center gap-2 sm:gap-3"
+      >
+        {TAGLINES.map((t, i) => (
+          <button
+            key={t.lead}
+            type="button"
+            onClick={() => { setStarted(true); setIndex(i); }}
+            className={`group relative flex items-center gap-2 rounded-full px-3.5 py-2 text-xs transition-colors ${
+              i === index ? "glass text-paper" : "text-paper/45 hover:text-paper/80"
+            }`}
+          >
+            <t.icon className={`size-3.5 transition-transform group-hover:scale-125 ${i === index ? "text-sun" : ""}`} />
+            {t.lead}
+            <span className="absolute inset-x-3 -bottom-px h-px overflow-hidden rounded-full bg-white/10">
+              {started && i === index && (
+                <span
+                  key={index}
+                  className="block h-full bg-sun rotator-fill"
+                  style={{ ["--hold" as string]: `${TAGLINE_HOLD}ms` }}
+                />
+              )}
+            </span>
+          </button>
+        ))}
+      </motion.div>
+    </div>
+  );
+}
+
+function Word({ children, className = "" }: { children: React.ReactNode; className?: string }) {
+  return (
+    <span className="inline-block overflow-hidden align-bottom pb-[0.08em] mr-[0.22em] last:mr-0">
+      <motion.span variants={wordVariants} className={`inline-block origin-bottom-left ${className}`}>
         {children}
       </motion.span>
     </span>
+  );
+}
+
+/* Micro-interaction: the wrapped element leans toward the cursor */
+function Magnetic({ children, strength = 0.3 }: { children: React.ReactNode; strength?: number }) {
+  const ref = useRef<HTMLDivElement>(null);
+  const x = useSpring(0, { stiffness: 220, damping: 16, mass: 0.4 });
+  const y = useSpring(0, { stiffness: 220, damping: 16, mass: 0.4 });
+
+  return (
+    <motion.div
+      ref={ref}
+      style={{ x, y }}
+      className="inline-flex"
+      onPointerMove={(e) => {
+        if (e.pointerType !== "mouse" || !ref.current) return;
+        const r = ref.current.getBoundingClientRect();
+        x.set((e.clientX - (r.left + r.width / 2)) * strength);
+        y.set((e.clientY - (r.top + r.height / 2)) * strength);
+      }}
+      onPointerLeave={() => { x.set(0); y.set(0); }}
+    >
+      {children}
+    </motion.div>
+  );
+}
+
+/* Photo with a shimmering skeleton until the image has loaded */
+function Photo({
+  src, alt, className = "", imgClassName = "", style,
+}: { src: string; alt: string; className?: string; imgClassName?: string; style?: React.CSSProperties }) {
+  const ref = useRef<HTMLImageElement>(null);
+  const [loaded, setLoaded] = useState(false);
+
+  // SSR'd images can finish loading before hydration, so onLoad never fires
+  useEffect(() => {
+    if (ref.current?.complete) setLoaded(true);
+  }, []);
+
+  return (
+    <div className={`relative overflow-hidden ${loaded ? "" : "skeleton"} ${className}`}>
+      <img
+        ref={ref}
+        src={src}
+        alt={alt}
+        loading="lazy"
+        decoding="async"
+        onLoad={() => setLoaded(true)}
+        style={{
+          transition: "opacity 0.7s ease, filter 0.7s ease, transform 1.2s cubic-bezier(0.22, 1, 0.36, 1)",
+          ...style,
+        }}
+        className={`absolute inset-0 size-full object-cover ${loaded ? "opacity-100 blur-0" : "opacity-0 blur-md"} ${imgClassName}`}
+      />
+    </div>
+  );
+}
+
+/* Thin progress bar along the top of the viewport */
+function ScrollProgress() {
+  const { scrollYProgress } = useScroll();
+  const scaleX = useSpring(scrollYProgress, { stiffness: 140, damping: 30, mass: 0.3 });
+  return (
+    <motion.div
+      style={{ scaleX }}
+      className="fixed top-0 inset-x-0 z-[60] h-[3px] origin-left bg-gradient-to-r from-water via-sun-glow to-sun"
+    />
   );
 }
 
@@ -625,9 +861,24 @@ function About() {
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
               transition={{ delay: 0.25, duration: 0.8 }}
-              className="absolute -bottom-8 -right-4 sm:-right-8 w-40 sm:w-56 rounded-2xl overflow-hidden border-4 border-ink shadow-deep aspect-square"
+              className="absolute -bottom-10 -right-3 sm:-right-8 w-32 sm:w-44 rounded-2xl overflow-hidden border-4 border-ink shadow-deep aspect-[9/16] bg-card"
             >
-              <img src={img.wip} alt="Trust crew raising a tank and solar panels on site" className="size-full object-cover" />
+              <video
+                src={video.technician}
+                poster={video.technicianPoster}
+                autoPlay
+                muted
+                loop
+                playsInline
+                preload="metadata"
+                aria-label="Trust technician in branded overalls on site"
+                className="size-full object-cover"
+              />
+              <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-ink/90 to-transparent px-3 pb-2.5 pt-8">
+                <div className="flex items-center gap-1.5 text-[9px] uppercase tracking-[0.2em] text-paper/90">
+                  <span className="size-1.5 rounded-full bg-[#25D366] animate-pulse" /> Meet the crew
+                </div>
+              </div>
             </motion.div>
 
             <motion.div
@@ -735,7 +986,7 @@ function About() {
 /* ---------------- SERVICES ---------------- */
 function Services() {
   const services = [
-    { icon: Droplets, title: "Borehole Drilling", desc: "Clean, reliable water at your doorstep. Full drilling, casing and capping with modern rigs.", img: img.crew },
+    { icon: Droplets, title: "Borehole Drilling", desc: "Clean, reliable water at your doorstep. Full drilling, casing and capping with modern rigs.", img: img.drillingRig },
     { icon: Sun, title: "Solar Installation", desc: "Powering your future — from cabin kits to whole-home off-grid solar with battery backup.", img: img.solarArray },
     { icon: Gauge, title: "Solar Pump Systems", desc: "Efficient. Sustainable. Reliable. Solar, submersible and surface pumps sized right for your borehole.", img: img.bindura },
     { icon: Waves, title: "Tanks & Water Storage", desc: "Durable, UV-resistant tanks from 1,000L to 10,000L, plus stands, plumbing and installation.", img: img.twinTanks },
@@ -919,11 +1170,35 @@ function Process() {
   return (
     <section id="process" className="relative py-24 md:py-32 px-6 border-t border-white/5">
       <div className="mx-auto max-w-7xl">
-        <SectionHeader
-          eyebrow="How we work"
-          title="From borehole survey to installation."
-          subtitle="We bring water to your life — five steps, one team, no hand-offs."
-        />
+        <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-10">
+          <SectionHeader
+            eyebrow="How we work"
+            title="From borehole survey to installation."
+            subtitle="We bring water to your life — five steps, one team, no hand-offs."
+          />
+          <motion.div
+            initial={{ opacity: 0, y: 30, rotate: 6 }}
+            whileInView={{ opacity: 1, y: 0, rotate: 3 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
+            className="relative w-36 sm:w-44 aspect-[9/16] shrink-0 self-start lg:self-end rounded-2xl overflow-hidden border border-white/10 shadow-deep bg-card hover:!rotate-0 hover:scale-105 transition-transform duration-500"
+          >
+            <video
+              src={video.rig}
+              poster={video.rigPoster}
+              autoPlay
+              muted
+              loop
+              playsInline
+              preload="metadata"
+              aria-label="Trust drilling rig at work on a borehole site"
+              className="size-full object-cover"
+            />
+            <div className="absolute left-2.5 top-2.5 flex items-center gap-1.5 rounded-full bg-ink/70 px-2.5 py-1 text-[9px] uppercase tracking-[0.2em] text-paper backdrop-blur">
+              <span className="size-1.5 rounded-full bg-red-500 animate-pulse" /> On the rig
+            </div>
+          </motion.div>
+        </div>
 
         <div className="mt-16 md:mt-20 grid sm:grid-cols-2 lg:grid-cols-5 gap-6">
           {steps.map((s, i) => (
@@ -960,6 +1235,9 @@ function Gallery() {
     { url: img.hilux, span: "", label: "On the road" },
     { url: img.solarArray, span: "", label: "Solar array & pump install" },
     { url: img.equipment, span: "", label: "Inverter & controller kit" },
+    { url: img.drillingCrew, span: "md:col-span-2", label: "Drilling crew at work" },
+    { url: img.boreholeGush, span: "", label: "Water strike" },
+    { url: img.drillingRig, span: "", label: "Rig on site" },
   ];
 
   return (
@@ -1149,6 +1427,752 @@ function CTA() {
   );
 }
 
+/* =================================================================
+   PARALLAX BANDS — the photo is pinned to the viewport (clip-path keeps it
+   inside its section) and only drifts slightly, so it reads as a background
+   moving far slower than the page. The copy drifts the other way for depth.
+   ================================================================= */
+function ParallaxBand({
+  src, alt, position = "center", shade = "bg-ink/55", className = "", children,
+}: {
+  src: string;
+  alt: string;
+  position?: string;
+  shade?: string;
+  className?: string;
+  children: React.ReactNode | ((progress: MotionValue<number>) => React.ReactNode);
+}) {
+  const ref = useRef<HTMLElement>(null);
+  const { scrollYProgress } = useScroll({ target: ref, offset: ["start end", "end start"] });
+  const bgY = useTransform(scrollYProgress, [0, 1], ["-5%", "5%"]);
+  const bgScale = useTransform(scrollYProgress, [0, 0.5, 1], [1.14, 1.04, 1.14]);
+  const fgY = useTransform(scrollYProgress, [0, 1], [70, -70]);
+
+  return (
+    <section ref={ref} className={`relative overflow-hidden [clip-path:inset(0)] ${className}`}>
+      <div className="pointer-events-none fixed inset-x-0 -top-[8lvh] h-[116lvh]">
+        <motion.img
+          src={src}
+          alt={alt}
+          loading="lazy"
+          style={{ y: bgY, scale: bgScale, objectPosition: position }}
+          className="size-full object-cover will-change-transform"
+        />
+      </div>
+      <div className={`absolute inset-0 ${shade}`} />
+      <div className="absolute inset-x-0 -top-px h-40 bg-gradient-to-b from-ink to-transparent" />
+      <div className="absolute inset-x-0 -bottom-px h-40 bg-gradient-to-t from-ink to-transparent" />
+
+      <motion.div style={{ y: fgY }} className="relative z-10">
+        {typeof children === "function" ? children(scrollYProgress) : children}
+      </motion.div>
+    </section>
+  );
+}
+
+function Eyebrow({ children }: { children: React.ReactNode }) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      className="text-xs uppercase tracking-[0.3em] text-sun flex items-center gap-3"
+    >
+      <span className="h-px w-8 bg-sun" />
+      {children}
+    </motion.div>
+  );
+}
+
+const fadeUp = (delay = 0) => ({
+  initial: { opacity: 0, y: 30 },
+  whileInView: { opacity: 1, y: 0 },
+  viewport: { once: true, margin: "-60px" },
+  transition: { delay, duration: 0.8, ease: [0.22, 1, 0.36, 1] as const },
+});
+
+function WaterStrikeBand() {
+  return (
+    <ParallaxBand
+      src={img.waterStrike}
+      alt="Water bursting from a freshly drilled borehole at night"
+      shade="bg-gradient-to-r from-ink/85 via-ink/50 to-ink/30"
+    >
+      <div className="mx-auto max-w-7xl px-6 min-h-[95svh] flex items-center py-32">
+        <div className="max-w-3xl space-y-7">
+          <Eyebrow>The moment we drill for</Eyebrow>
+          <motion.h2
+            {...fadeUp(0.05)}
+            className="font-display text-5xl sm:text-6xl md:text-8xl font-light leading-[0.92] tracking-[-0.02em] text-balance"
+          >
+            When the ground gives back, <em className="italic shimmer-text">everyone cheers.</em>
+          </motion.h2>
+          <motion.p {...fadeUp(0.15)} className="max-w-xl text-lg text-foreground/80 leading-relaxed">
+            All the surveying, the drilling and the patience come down to one moment — the first rush of
+            water from deep underground. It never gets old, and it's the reason we do this work.
+          </motion.p>
+          <motion.div {...fadeUp(0.25)} className="flex flex-wrap gap-3 pt-2">
+            {["Geological survey first", "Modern drilling rigs", "Yield-tested before handover"].map((c) => (
+              <span key={c} className="flex items-center gap-2 rounded-full glass px-4 py-2 text-sm text-paper/85">
+                <CheckCircle2 className="size-4 text-sun" /> {c}
+              </span>
+            ))}
+          </motion.div>
+        </div>
+      </div>
+    </ParallaxBand>
+  );
+}
+
+function ProjectIntroBand() {
+  return (
+    <ParallaxBand
+      src={uz.communityWide}
+      alt="Uzumba-Maramba-Pfungwe community gathered around a Trust solar borehole installation"
+      shade="bg-gradient-to-t from-ink/90 via-ink/45 to-ink/30"
+    >
+      <div className="mx-auto max-w-7xl px-6 min-h-[105svh] flex flex-col justify-end pt-40 pb-28">
+        <motion.div
+          {...fadeUp()}
+          className="inline-flex w-fit items-center gap-2 rounded-full glass px-4 py-2 text-[11px] uppercase tracking-[0.25em] text-paper/85"
+        >
+          <MapPin className="size-3.5 text-sun" /> Featured project · Mashonaland East · September 2026
+        </motion.div>
+        <h2 className="mt-8 font-display font-light text-[clamp(3rem,10vw,8.5rem)] leading-[0.88] tracking-[-0.03em]">
+          {["Uzumba-", "Maramba-"].map((w, i) => (
+            <span key={w} className="block overflow-hidden">
+              <motion.span
+                initial={{ y: "105%" }}
+                whileInView={{ y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.12, duration: 1, ease: [0.22, 1, 0.36, 1] }}
+                className="block"
+              >
+                {w}
+              </motion.span>
+            </span>
+          ))}
+          <span className="block overflow-hidden">
+            <motion.em
+              initial={{ y: "105%" }}
+              whileInView={{ y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.24, duration: 1, ease: [0.22, 1, 0.36, 1] }}
+              className="block italic text-sun"
+            >
+              Pfungwe.
+            </motion.em>
+          </span>
+        </h2>
+        <motion.p {...fadeUp(0.35)} className="mt-8 max-w-xl text-lg text-foreground/85 leading-relaxed">
+          One rural community. One solar-powered borehole. A crew that brought everything in by road and built
+          it by hand — with half the village watching. This is how it came together.
+        </motion.p>
+        <motion.a
+          href="#projects"
+          {...fadeUp(0.45)}
+          className="group mt-10 inline-flex w-fit items-center gap-3 text-sm text-paper/80 hover:text-sun transition-colors"
+        >
+          <span className="grid size-11 place-items-center rounded-full glass group-hover:bg-sun group-hover:text-ink transition-colors">
+            <ChevronDown className="size-4 animate-bounce" />
+          </span>
+          Follow the story
+        </motion.a>
+      </div>
+    </ParallaxBand>
+  );
+}
+
+/* =================================================================
+   UZUMBA STORY — sticky photo frame that changes with each chapter
+   ================================================================= */
+const STORY = [
+  {
+    n: "01",
+    kicker: "The journey",
+    title: "The road in.",
+    img: uz.truckRoad,
+    inset: uz.truckLoaded,
+    alt: "Trust truck carrying a water tank, steel stand and solar panels along the road",
+    body: "Every project starts on the road. Our truck rolls out loaded with everything the site needs — the storage tank, a welded steel tank stand and the solar panels — strapped down tight for the long journey into Uzumba-Maramba-Pfungwe.",
+  },
+  {
+    n: "02",
+    kicker: "The crew",
+    title: "Many hands.",
+    img: uz.panelCarry,
+    alt: "Trust crew carrying a large solar panel across the site by hand",
+    body: "Out here there are no cranes — just a crew that knows its craft. Panel by panel, the solar array is carried across rough ground and set onto its frame by hand.",
+  },
+  {
+    n: "03",
+    kicker: "The community",
+    title: "The whole village came out.",
+    img: uz.community,
+    alt: "Women, children and neighbours watching the Trust crew install the solar array",
+    body: "Mothers with babies on their backs, curious children, neighbours lending a hand. A borehole here isn't just an installation — it's a community event, and everyone wanted to see it happen.",
+  },
+  {
+    n: "04",
+    kicker: "The build",
+    title: "Raising the tower.",
+    img: uz.towerCrew,
+    inset: uz.towerPlumbing,
+    alt: "Water tank raised on its steel stand while the crew connects the plumbing",
+    body: "The tank goes up onto its steel stand — high enough for gravity to do the work. Pipes are run, joints sealed and the pump wired to the panels while the crew tests every connection.",
+  },
+  {
+    n: "05",
+    kicker: "The result",
+    title: "Water, powered by the sun.",
+    img: uz.complete,
+    alt: "Completed Trust solar borehole with solar array and elevated tank in Uzumba-Maramba-Pfungwe",
+    body: "The finished picture: a solar array driving the pump, an elevated tank full of clean water, and a community with water close to home. No generator, no fuel bills — just sunlight, and a job done right.",
+  },
+];
+
+function UzumbaStory() {
+  const [active, setActive] = useState(0);
+  const chapter = STORY[active];
+
+  return (
+    <section id="projects" className="relative px-6 py-24 md:py-32">
+      <div className="mx-auto max-w-7xl">
+        <SectionHeader
+          eyebrow="Featured project"
+          title="Five moments. One borehole."
+          subtitle="Scroll through the Uzumba-Maramba-Pfungwe build — from the first kilometre on the road to the first drop at the tap."
+        />
+
+        <div className="mt-12 lg:mt-4 grid lg:grid-cols-[1fr_1.05fr] gap-x-20">
+          {/* Chapters */}
+          <div>
+            {STORY.map((c, i) => (
+              <StoryChapter key={c.n} chapter={c} index={i} active={active === i} onActive={setActive} />
+            ))}
+
+            <motion.div
+              {...fadeUp()}
+              className="relative mt-4 lg:mb-[20svh] overflow-hidden rounded-3xl border border-sun/30 bg-card/70 p-7 sm:p-9"
+            >
+              <div className="absolute -top-20 -right-20 size-56 rounded-full bg-sun/15 blur-3xl" />
+              <div className="relative text-[10px] uppercase tracking-[0.3em] text-sun">Delivered</div>
+              <ul className="relative mt-5 space-y-3">
+                {[
+                  "Solar array powering the borehole pump",
+                  "Elevated storage tank on a steel stand",
+                  "Clean water within reach of the community",
+                ].map((f) => (
+                  <li key={f} className="flex items-start gap-3 text-sm sm:text-base">
+                    <CheckCircle2 className="mt-0.5 size-4 shrink-0 text-sun" /> {f}
+                  </li>
+                ))}
+              </ul>
+              <div className="relative mt-7 flex flex-wrap items-center gap-4">
+                <Magnetic>
+                  <a
+                    href={waWith("Hi Trust 👋 I saw the Uzumba-Maramba-Pfungwe project and I'd like a quote for a similar solar borehole.")}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="group inline-flex items-center gap-2 rounded-full bg-sun px-6 py-3.5 text-sm font-medium text-primary-foreground shadow-glow active:scale-95 transition-transform"
+                  >
+                    Build one for my community
+                    <ArrowUpRight className="size-4 group-hover:rotate-45 transition-transform" />
+                  </a>
+                </Magnetic>
+                <span className="text-xs text-muted-foreground">Free site survey quote</span>
+              </div>
+            </motion.div>
+          </div>
+
+          {/* Sticky frame (desktop) */}
+          <div className="hidden lg:block">
+            <div className="sticky top-0 h-[100svh] flex items-center">
+              <div className="relative w-full max-w-[560px] mx-auto">
+                <div className="absolute -inset-10 rounded-[3rem] bg-water/15 blur-3xl" />
+
+                <div className="relative aspect-square overflow-hidden rounded-[2rem] border border-white/10 shadow-deep bg-card">
+                  {STORY.map((c, i) => (
+                    <motion.img
+                      key={c.n}
+                      src={c.img}
+                      alt={c.alt}
+                      loading="lazy"
+                      initial={false}
+                      animate={{
+                        opacity: active === i ? 1 : 0,
+                        scale: active === i ? 1 : 1.12,
+                        filter: active === i ? "blur(0px)" : "blur(6px)",
+                      }}
+                      transition={{ duration: 1.1, ease: [0.22, 1, 0.36, 1] }}
+                      className="absolute inset-0 size-full object-cover"
+                    />
+                  ))}
+                  <div className="absolute inset-0 bg-gradient-to-t from-ink/85 via-transparent to-transparent" />
+
+                  <div className="absolute inset-x-0 bottom-0 p-7 flex items-end justify-between gap-4">
+                    <AnimatePresence mode="wait">
+                      <motion.div
+                        key={chapter.n}
+                        initial={{ opacity: 0, y: 14 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -10 }}
+                        transition={{ duration: 0.45 }}
+                      >
+                        <div className="text-[10px] uppercase tracking-[0.3em] text-sun">{chapter.kicker}</div>
+                        <div className="mt-1 font-display text-3xl text-paper">{chapter.title}</div>
+                      </motion.div>
+                    </AnimatePresence>
+                    <div className="font-mono-tight text-sm text-paper/70 tabular-nums">
+                      <span className="text-sun">{chapter.n}</span> / 0{STORY.length}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Secondary photo for chapters that have one */}
+                <AnimatePresence>
+                  {chapter.inset && (
+                    <motion.div
+                      key={chapter.inset}
+                      initial={{ opacity: 0, y: 30, rotate: -10, scale: 0.85 }}
+                      animate={{ opacity: 1, y: 0, rotate: -5, scale: 1 }}
+                      exit={{ opacity: 0, y: 20, rotate: -12, scale: 0.85 }}
+                      transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+                      className="absolute -left-10 -top-10 w-44 aspect-square overflow-hidden rounded-2xl border-4 border-ink shadow-deep"
+                    >
+                      <img src={chapter.inset} alt="" className="size-full object-cover" />
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+
+                {/* Chapter progress */}
+                <div className="absolute -right-8 top-1/2 -translate-y-1/2 flex flex-col gap-2">
+                  {STORY.map((c, i) => (
+                    <span
+                      key={c.n}
+                      className={`w-[3px] rounded-full transition-all duration-500 ${
+                        i === active ? "h-12 bg-sun" : i < active ? "h-6 bg-sun/50" : "h-6 bg-white/15"
+                      }`}
+                    />
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function StoryChapter({
+  chapter, index, active, onActive,
+}: { chapter: (typeof STORY)[number]; index: number; active: boolean; onActive: (i: number) => void }) {
+  const ref = useRef<HTMLDivElement>(null);
+  const inView = useInView(ref, { margin: "-45% 0px -45% 0px" });
+
+  useEffect(() => {
+    if (inView) onActive(index);
+  }, [inView, index, onActive]);
+
+  return (
+    <div ref={ref} className="lg:min-h-[85svh] flex flex-col justify-center py-10 lg:py-0">
+      <Photo
+        src={chapter.img}
+        alt={chapter.alt}
+        className="lg:hidden mb-8 aspect-square rounded-3xl border border-white/10 shadow-deep"
+      />
+      <div className={`transition-opacity duration-700 ${active ? "lg:opacity-100" : "lg:opacity-25"}`}>
+        <motion.div {...fadeUp()}>
+          <div className="flex items-center gap-4">
+            <span className="font-display text-6xl leading-none text-transparent [-webkit-text-stroke:1px_var(--sun)]">
+              {chapter.n}
+            </span>
+            <span className="h-px w-12 bg-sun/50" />
+            <span className="text-xs uppercase tracking-[0.3em] text-sun">{chapter.kicker}</span>
+          </div>
+          <h3 className="mt-5 font-display text-4xl sm:text-5xl md:text-6xl leading-[0.95] tracking-[-0.02em] text-balance">
+            {chapter.title}
+          </h3>
+          <p className="mt-5 max-w-lg text-lg text-foreground/75 leading-relaxed">{chapter.body}</p>
+        </motion.div>
+      </div>
+    </div>
+  );
+}
+
+/* Two rows of project photos sliding in opposite directions, at different speeds */
+function ProjectFilmstrip() {
+  const ref = useRef<HTMLElement>(null);
+  const { scrollYProgress } = useScroll({ target: ref, offset: ["start end", "end start"] });
+  const x1 = useTransform(scrollYProgress, [0, 1], ["0%", "-30%"]);
+  const x2 = useTransform(scrollYProgress, [0, 1], ["-24%", "0%"]);
+
+  const row1 = [
+    { src: uz.truckRoad, label: "On the road" },
+    { src: uz.panelCarry, label: "Carrying the array" },
+    { src: uz.community, label: "The community gathers" },
+    { src: uz.towerCrew, label: "Tower raised" },
+    { src: uz.complete, label: "Project done" },
+    { src: uz.truckLoaded, label: "Loaded & strapped" },
+  ];
+  const row2 = [
+    { src: uz.communityWide, label: "Many hands" },
+    { src: uz.towerPlumbing, label: "Plumbing the stand" },
+    { src: uz.truckLoaded, label: "Tank, stand & panels" },
+    { src: uz.complete, label: "Powered by the sun" },
+    { src: uz.panelCarry, label: "No cranes needed" },
+    { src: uz.towerCrew, label: "Final checks" },
+  ];
+
+  return (
+    <section ref={ref} className="relative py-20 md:py-28 overflow-hidden border-y border-white/5 bg-card/30">
+      <div className="mx-auto max-w-7xl px-6 mb-10 flex flex-wrap items-end justify-between gap-4">
+        <div>
+          <Eyebrow>From the site</Eyebrow>
+          <motion.h3 {...fadeUp(0.05)} className="mt-5 font-display text-4xl sm:text-5xl font-light">
+            Uzumba-Maramba-Pfungwe, <em className="italic text-sun">in pictures.</em>
+          </motion.h3>
+        </div>
+        <a
+          href="#gallery"
+          className="group inline-flex items-center gap-2 text-sm text-paper/70 hover:text-sun transition-colors"
+        >
+          More of our work <ArrowUpRight className="size-4 group-hover:rotate-45 transition-transform" />
+        </a>
+      </div>
+
+      <div className="space-y-4">
+        {[{ row: row1, x: x1 }, { row: row2, x: x2 }].map(({ row, x }, r) => (
+          <motion.div key={r} style={{ x }} className="flex gap-4 w-max px-4 will-change-transform">
+            {row.map((t, i) => (
+              <div
+                key={i}
+                className="group relative w-[64vw] sm:w-[40vw] lg:w-[24vw] aspect-[4/3] shrink-0 overflow-hidden rounded-2xl border border-white/5"
+              >
+                <Photo src={t.src} alt={t.label} className="size-full" imgClassName="group-hover:scale-110" />
+                <div className="absolute inset-0 bg-gradient-to-t from-ink/85 via-transparent to-transparent opacity-60 group-hover:opacity-100 transition-opacity duration-500" />
+                <div className="absolute bottom-3 left-4 font-display text-lg text-paper translate-y-2 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-500">
+                  {t.label}
+                </div>
+              </div>
+            ))}
+          </motion.div>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+/* =================================================================
+   THE TRUST FAMILY — the three brands
+   ================================================================= */
+function TiltCard({ children, className = "" }: { children: React.ReactNode; className?: string }) {
+  const ref = useRef<HTMLDivElement>(null);
+  const rx = useSpring(0, { stiffness: 180, damping: 18 });
+  const ry = useSpring(0, { stiffness: 180, damping: 18 });
+
+  return (
+    <motion.div
+      ref={ref}
+      style={{ rotateX: rx, rotateY: ry, transformPerspective: 1000 }}
+      onPointerMove={(e) => {
+        if (e.pointerType !== "mouse" || !ref.current) return;
+        const r = ref.current.getBoundingClientRect();
+        ry.set(((e.clientX - r.left) / r.width - 0.5) * 10);
+        rx.set(-((e.clientY - r.top) / r.height - 0.5) * 10);
+      }}
+      onPointerLeave={() => { rx.set(0); ry.set(0); }}
+      className={className}
+    >
+      {children}
+    </motion.div>
+  );
+}
+
+function TrustFamily() {
+  const brands = [
+    {
+      logo: LOGO,
+      name: "Trust Borehole and Solar",
+      tag: "Water & power",
+      icon: Droplets,
+      line: "Survey, drilling, tanks and solar pumps — the complete water solution, from first survey to running tap.",
+      cta: "Our services",
+      href: "#services",
+    },
+    {
+      logo: img.brandSolarHome,
+      name: "Trust Solar Home",
+      tag: "Home energy",
+      icon: House,
+      line: "Solar for the home — panels, inverters and battery backup that keep your lights on through every power cut.",
+      cta: "Ask about home solar",
+      href: waWith("Hi Trust Solar Home ☀️ I'd like a quote for a home solar system."),
+      external: true,
+    },
+    {
+      logo: img.brandIrrigation,
+      name: "Trust Irrigation",
+      tag: "Agriculture",
+      icon: Sprout,
+      line: "High-pressure water for horticulture and overhead irrigation. More water, more yields.",
+      cta: "See irrigation",
+      href: "#irrigation",
+    },
+  ];
+
+  return (
+    <section id="family" className="relative py-24 md:py-32 px-6">
+      <div className="mx-auto max-w-7xl">
+        <SectionHeader
+          eyebrow="The Trust family"
+          title="One name. Three promises."
+          subtitle="Water, power and growth — each with its own focus, all built on the same trust."
+        />
+
+        <div className="mt-16 grid md:grid-cols-3 gap-6">
+          {brands.map((b, i) => (
+            <motion.div key={b.name} {...fadeUp(i * 0.1)}>
+              <TiltCard className="h-full">
+                <a
+                  href={b.href}
+                  {...(b.external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
+                  className="group lift flex h-full flex-col overflow-hidden rounded-3xl border border-white/10 bg-card"
+                >
+                  <div className="relative grid h-56 place-items-center bg-paper p-8 overflow-hidden">
+                    <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_120%,oklch(0.62_0.14_230/0.18),transparent_60%)]" />
+                    <img
+                      src={b.logo}
+                      alt={`${b.name} logo`}
+                      loading="lazy"
+                      className="relative h-40 w-auto max-w-full object-contain mix-blend-multiply group-hover:scale-105 transition-transform duration-700"
+                    />
+                  </div>
+                  <div className="flex flex-1 flex-col p-7">
+                    <div className="flex items-center gap-2 text-[10px] uppercase tracking-[0.25em] text-sun">
+                      <b.icon className="size-3.5" /> {b.tag}
+                    </div>
+                    <h3 className="mt-3 font-display text-3xl leading-tight">{b.name}</h3>
+                    <p className="mt-3 flex-1 text-sm text-muted-foreground leading-relaxed">{b.line}</p>
+                    <span className="mt-6 inline-flex items-center gap-2 text-sm text-sun group-hover:gap-3 transition-all">
+                      {b.cta} <ArrowUpRight className="size-4 group-hover:rotate-45 transition-transform" />
+                    </span>
+                  </div>
+                </a>
+              </TiltCard>
+            </motion.div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ---------------- IRRIGATION ---------------- */
+function Irrigation() {
+  const ref = useRef<HTMLElement>(null);
+  const { scrollYProgress } = useScroll({ target: ref, offset: ["start end", "end start"] });
+  const posterY = useTransform(scrollYProgress, [0, 1], [60, -60]);
+  const badgeY = useTransform(scrollYProgress, [0, 1], [140, -140]);
+  const chipY = useTransform(scrollYProgress, [0, 1], [50, -50]);
+
+  const features = [
+    "High pressure",
+    "Ideal for horticulture",
+    "Perfect for overhead irrigation",
+    "Increase yields",
+    "Reliable and long lasting",
+  ];
+
+  return (
+    <section id="irrigation" ref={ref} className="relative overflow-hidden py-24 md:py-32 px-6 border-t border-white/5">
+      <div className="absolute -left-40 top-1/3 size-[460px] rounded-full bg-emerald-500/10 blur-3xl float-slow" />
+      <div className="absolute -right-40 bottom-0 size-[460px] rounded-full bg-water/15 blur-3xl float-slow" style={{ animationDelay: "-4s" }} />
+
+      <div className="relative mx-auto max-w-7xl grid lg:grid-cols-2 gap-16 lg:gap-20 items-center">
+        <div className="space-y-8">
+          <Eyebrow>Trust Irrigation</Eyebrow>
+          <motion.h2
+            {...fadeUp(0.05)}
+            className="font-display text-5xl sm:text-6xl md:text-7xl font-light leading-[0.95] tracking-[-0.02em]"
+          >
+            High-pressure water.<br />
+            <em className="italic text-emerald-400">More yields.</em>
+          </motion.h2>
+          <motion.p {...fadeUp(0.12)} className="max-w-xl text-lg text-foreground/80 leading-relaxed">
+            For horticulture and overhead irrigation, pressure is everything. We match the borehole pump,
+            pipework and storage to your land so every sprinkler and dripper gets a strong, steady flow —
+            season after season.
+          </motion.p>
+
+          <ul className="grid sm:grid-cols-2 gap-3">
+            {features.map((f, i) => (
+              <motion.li
+                key={f}
+                {...fadeUp(0.15 + i * 0.06)}
+                className="group flex items-center gap-3 rounded-2xl border border-white/8 bg-card/50 px-4 py-3.5 text-sm hover:border-emerald-400/40 transition-colors"
+              >
+                <span className="grid size-7 shrink-0 place-items-center rounded-full bg-emerald-400/15 text-emerald-400 group-hover:bg-emerald-400 group-hover:text-ink transition-colors">
+                  <CheckCircle2 className="size-4" />
+                </span>
+                {f}
+              </motion.li>
+            ))}
+          </ul>
+
+          <motion.div {...fadeUp(0.3)} className="flex flex-wrap items-center gap-5 pt-2">
+            <Magnetic>
+              <a
+                href={waWith("Hi Trust Irrigation 🌱 I'd like a quote for a high-pressure irrigation system.")}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group inline-flex items-center gap-2 rounded-full bg-emerald-400 px-7 py-4 text-sm font-semibold text-ink shadow-[0_20px_50px_-15px_oklch(0.75_0.17_155/0.6)] active:scale-95 transition-transform"
+              >
+                Plan my irrigation
+                <ArrowUpRight className="size-4 group-hover:rotate-45 transition-transform" />
+              </a>
+            </Magnetic>
+            <span className="font-display italic text-2xl text-paper/55">Water that works.</span>
+          </motion.div>
+        </div>
+
+        <div className="relative mx-auto w-full max-w-md">
+          <motion.div style={{ y: posterY }} className="relative">
+            <div className="absolute -inset-8 rounded-[3rem] bg-water/25 blur-3xl" />
+            <motion.div
+              initial={{ opacity: 0, rotate: 7, y: 40 }}
+              whileInView={{ opacity: 1, rotate: 2, y: 0 }}
+              whileHover={{ rotate: 0, scale: 1.02 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
+              className="relative overflow-hidden rounded-[1.75rem] border border-white/15 shadow-deep"
+            >
+              <Photo
+                src={img.irrigationFlyer}
+                alt="Trust high pressure water solutions for horticulture and overhead irrigation"
+                className="aspect-[809/1080]"
+              />
+            </motion.div>
+          </motion.div>
+
+          <motion.div
+            style={{ y: badgeY }}
+            className="absolute -left-4 sm:-left-16 top-[42%] w-32 sm:w-40 -rotate-6 rounded-2xl bg-paper p-3 shadow-deep"
+          >
+            <img src={img.brandIrrigation} alt="Trust Irrigation logo" loading="lazy" className="w-full mix-blend-multiply" />
+          </motion.div>
+          <motion.div
+            style={{ y: chipY }}
+            className="absolute right-0 sm:-right-6 -top-14 flex items-center gap-2 rounded-full glass px-4 py-2.5 text-xs text-paper backdrop-blur-xl"
+          >
+            <Sprout className="size-4 text-emerald-400" /> More water, more yields
+          </motion.div>
+        </div>
+      </div>
+
+      <div className="relative mx-auto max-w-7xl mt-24">
+        <motion.div {...fadeUp()} className="mb-6 flex items-center gap-3 text-xs uppercase tracking-[0.3em] text-emerald-400">
+          <span className="h-px w-8 bg-emerald-400" /> Irrigation in action
+        </motion.div>
+        <div className="grid sm:grid-cols-3 gap-4">
+          {[
+            { src: img.irrigationRural, label: "Supporting small-scale rural farmers" },
+            { src: img.irrigationFlow, label: "Strong, steady flow from the borehole" },
+            { src: img.solarPumpCanal, label: "Solar pump feeding the fields" },
+          ].map((t, i) => (
+            <motion.div
+              key={t.src}
+              {...fadeUp(i * 0.1)}
+              className="group relative aspect-square overflow-hidden rounded-3xl border border-white/10"
+            >
+              <Photo src={t.src} alt={t.label} className="size-full" imgClassName="group-hover:scale-110" />
+              <div className="absolute inset-0 bg-gradient-to-t from-ink/90 via-ink/10 to-transparent opacity-80 group-hover:opacity-100 transition-opacity" />
+              <div className="absolute bottom-4 left-5 right-5 flex items-end justify-between gap-3">
+                <span className="font-display text-xl leading-tight text-paper">{t.label}</span>
+                <ArrowUpRight className="size-4 shrink-0 text-emerald-400 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-500" />
+              </div>
+            </motion.div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function RoadBand() {
+  return (
+    <ParallaxBand
+      src={uz.truckRoad}
+      alt="Trust truck delivering a tank and solar panels along a rural road"
+      position="center 45%"
+      shade="bg-gradient-to-l from-ink/90 via-ink/55 to-ink/20"
+    >
+      <div className="mx-auto max-w-7xl px-6 min-h-[90svh] flex items-center justify-end py-32">
+        <div className="max-w-xl space-y-7">
+          <Eyebrow>Nationwide</Eyebrow>
+          <motion.h2
+            {...fadeUp(0.05)}
+            className="font-display text-5xl sm:text-6xl md:text-7xl font-light leading-[0.95] tracking-[-0.02em]"
+          >
+            Wherever the road goes, <em className="italic text-sun">we go.</em>
+          </motion.h2>
+          <motion.p {...fadeUp(0.12)} className="text-lg text-foreground/80 leading-relaxed">
+            From Harare's suburbs to remote rural homesteads, our crew delivers tanks, stands and solar arrays
+            to your site — and installs them on the spot.
+          </motion.p>
+          <motion.div {...fadeUp(0.2)} className="flex flex-wrap gap-2.5">
+            {["Harare", "Bindura", "Hampden", "Uzumba-Maramba-Pfungwe"].map((p) => (
+              <span key={p} className="flex items-center gap-1.5 rounded-full glass px-3.5 py-2 text-sm text-paper/85 hover:text-sun hover:border-sun/40 transition-colors">
+                <MapPin className="size-3.5 text-sun" /> {p}
+              </span>
+            ))}
+            <span className="flex items-center gap-1.5 rounded-full bg-sun/90 px-3.5 py-2 text-sm font-medium text-ink">
+              <Truck className="size-3.5" /> + more every month
+            </span>
+          </motion.div>
+        </div>
+      </div>
+    </ParallaxBand>
+  );
+}
+
+function ManifestoBand() {
+  return (
+    <ParallaxBand
+      src={img.engineerWalk}
+      alt="Trust engineer in a hard hat walking from a newly installed water tank"
+      position="center 30%"
+      shade="bg-ink/65"
+    >
+      {(progress) => (
+        <div className="mx-auto max-w-7xl px-6 min-h-[110svh] flex flex-col justify-center py-32">
+          <Eyebrow>Our promise</Eyebrow>
+          <div className="mt-8 font-display font-light text-[clamp(3rem,9.5vw,8.5rem)] leading-[0.95] tracking-[-0.025em]">
+            <ManifestoLine progress={progress} range={[0.26, 0.4]}>Water is life.</ManifestoLine>
+            <ManifestoLine progress={progress} range={[0.34, 0.48]} className="text-sun">Solar is power.</ManifestoLine>
+            <ManifestoLine progress={progress} range={[0.42, 0.56]} className="italic shimmer-text">
+              Trust is our name.
+            </ManifestoLine>
+          </div>
+        </div>
+      )}
+    </ParallaxBand>
+  );
+}
+
+function ManifestoLine({
+  progress, range, className = "", children,
+}: { progress: MotionValue<number>; range: [number, number]; className?: string; children: React.ReactNode }) {
+  const opacity = useTransform(progress, range, [0.12, 1]);
+  const x = useTransform(progress, range, [-50, 0]);
+  return (
+    <motion.div style={{ opacity, x }}>
+      <span className={className}>{children}</span>
+    </motion.div>
+  );
+}
+
 /* ---------------- FOOTER ---------------- */
 function Footer() {
   return (
@@ -1196,6 +2220,8 @@ function Footer() {
             <li><a href="#services" className="hover:text-sun transition-colors">Solar pump systems</a></li>
             <li><a href="#services" className="hover:text-sun transition-colors">Tanks & water storage</a></li>
             <li><a href="#services" className="hover:text-sun transition-colors">Maintenance & support</a></li>
+            <li><a href="#irrigation" className="hover:text-sun transition-colors">Trust Irrigation</a></li>
+            <li><a href="#family" className="hover:text-sun transition-colors">Trust Solar Home</a></li>
           </ul>
         </div>
 
